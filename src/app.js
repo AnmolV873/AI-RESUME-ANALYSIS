@@ -3,6 +3,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import { globalErrorHandler, notFoundHandler } from './middleware/error.middleware.js';
 import authRoutes from './modules/auth/auth.route.js';
+import resumeRoute from './modules/resume/resume.route.js';
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.get('/health', (req, res) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/resumes', resumeRoute);
 
 // 404 handler - must be after all routes
 app.use(notFoundHandler);
