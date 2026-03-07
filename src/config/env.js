@@ -16,6 +16,8 @@ const envSchema = z.object({
 
   RESUME_STRONG_THRESHOLD: z.string().default('75'),
   JD_MATCH_STRONG_THRESHOLD: z.string().default('70'),
+
+  SARVAM_API_KEY: z.string().min(1, 'SARVAM_API_KEY is required'),
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -40,4 +42,6 @@ export const env = {
 
   RESUME_STRONG_THRESHOLD: parseInt(parsed.data.RESUME_STRONG_THRESHOLD, 10),
   JD_MATCH_STRONG_THRESHOLD: parseInt(parsed.data.JD_MATCH_STRONG_THRESHOLD, 10),
+
+  SARVAM_API_KEY: parsed.data.SARVAM_API_KEY,
 };

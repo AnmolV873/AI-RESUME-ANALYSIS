@@ -17,6 +17,7 @@ model User {
   createdAt DateTime @default(now())
 
   resumes   Resume[]
+  jobs      JobDescription[]
 }
 
 model Resume {
@@ -33,11 +34,13 @@ model Resume {
 
 model JobDescription {
   id        String   @id @default(uuid())
+  userId    String
   title     String
   content   String
   createdAt DateTime @default(now())
 
   matches   Match[]
+  user     User     @relation(fields: [userId], references: [id])
 }
 
 model Match {
