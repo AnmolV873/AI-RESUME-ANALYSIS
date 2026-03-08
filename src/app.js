@@ -1,38 +1,37 @@
 import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import cors from 'cors';
 import { globalErrorHandler, notFoundHandler } from './middleware/error.middleware.js';
 import authRoutes from './modules/auth/auth.route.js';
-import resumeRoute from './modules/resume/resume.route.js';
+import resumeRoutes from './modules/resume/resume.route.js';
 import jobRoutes from './modules/job-description/jobdescription.route.js';
-import matchRoute from './modules/matching/matching.route.js';
+import matchRoutes from './modules/matching/matching.route.js';
 
 const app = express();
 
-// Security headers
+// CORS must be the FIRST middleware
+// It tells the browser "yes, requests from localhost:5173 are allowed"
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+}));
+
 app.use(helmet());
-// Request logging - only in development
 app.use(morgan('dev'));
-// Parse incoming JSON
 app.use(express.json());
-// Parse URL-encoded form data
 app.use(express.urlencoded({ extended: true }));
 
-// Health check
 app.get('/health', (req, res) => {
   res.json({ success: true, message: 'Server is running' });
 });
 
-// Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/resumes', resumeRoute);
+app.use('/api/resumes', resumeRoutes);
 app.use('/api/jobs', jobRoutes);
-app.use('/api/matches', matchRoute);
+app.use('/api/match', matchRoutes);
 
-// 404 handler - must be after all routes
 app.use(notFoundHandler);
-
-// Global error handler - must be last
 app.use(globalErrorHandler);
 
 export default app;
