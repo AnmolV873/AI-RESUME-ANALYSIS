@@ -7,6 +7,13 @@ const require = createRequire(import.meta.url);
 const pdfParse = require('pdf-parse');
 
 
+const sanitizeText = (text) => {
+  // Postgres does not allow NUL bytes (0x00) in text fields.
+  // Some parsers (especially PDF text extraction) may return strings containing \u0000.
+  // Remove them to avoid "invalid byte sequence for encoding \"UTF8\": 0x00" errors.
+  return text.replace(/\u0000/g, '');
+};
+
 export const extractTextFromFile = async (filePath, mimetype) => {
   const buffer = await fs.readFile(filePath);
 
@@ -17,7 +24,7 @@ export const extractTextFromFile = async (filePath, mimetype) => {
       throw new AppError('Could not extract text from PDF. The file may be scanned or image-based.', 400);
     }
 
-    return data.text.trim();
+    return sanitizeText(data.text).trim();
   }
 
   if (mimetype === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
@@ -27,7 +34,7 @@ export const extractTextFromFile = async (filePath, mimetype) => {
       throw new AppError('Could not extract text from DOCX file.', 400);
     }
 
-    return result.value.trim();
+    return sanitizeText(result.value).trim();
   }
 
   throw new AppError('Unsupported file type', 400);
