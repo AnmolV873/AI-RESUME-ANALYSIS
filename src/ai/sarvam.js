@@ -56,6 +56,22 @@ export const callSarvamJSON = async (systemPrompt, userMessage) => {
   try {
     return JSON.parse(cleaned);
   } catch {
-    throw new AppError(`AI returned invalid JSON: ${cleaned.slice(0, 200)}`, 502);
+    const extractJsonObject = (text) => {
+      const firstBrace = text.indexOf('{');
+      const lastBrace = text.lastIndexOf('}');
+      if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) return null;
+      return text.slice(firstBrace, lastBrace + 1);
+    };
+
+    const extracted = extractJsonObject(cleaned);
+    if (extracted) {
+      try {
+        return JSON.parse(extracted);
+      } catch {
+        // fall through to final error
+      }
+    }
+
+    throw new AppError(`AI returned invalid JSON: ${cleaned.slice(0, 300)}`, 502);
   }
 };
